@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 import os
 import imaplib
 import email
+import re
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -23,9 +25,9 @@ def process_email_text(text):
     extracted_data = []
 
     for line in lines:
-        part_before_p = line.split("P")[0]
-        sku_upc = part_before_p.replace(' ', '').strip()
-        if sku_upc:
+        match = re.search(r'^\s*(\d\s+\d{5}\s+\d{5}\s+\d)\s+P', line)
+        if match:
+            sku_upc = match.group(1).replace(' ', '')
             extracted_data.append(sku_upc)
 
     return extracted_data
@@ -39,7 +41,12 @@ def write_to_csv(data, filename='nordsvcp.csv'):
     Each entry is written in a predefined format, including setting the quantity
     to 0 and status to 'discontinued'.
     """
-    with open(filename, 'w') as file:
+
+    # Generate a unique filename based on the current date and time
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    unique_filename = f'nordsvcp_{timestamp}.csv'
+
+    with open(unique_filename, 'w') as file:
         file.write('SKU,UPC,EAN,QUANTITY_AVAILABLE,STATUS,\n')
         for item in data:
             file.write(f'{item},{item},,0,discontinued,\n')
@@ -89,7 +96,7 @@ def fetch_emails():
                     body = get_email_body(msg)
                     subject = msg['subject']
                     print(f'Subject: {subject}')
-                    print(f'Body: {body}')
+                    # print(f'Body: {body}')
                     extracted_data = process_email_text(body)
                     write_to_csv(extracted_data)
                     mail.uid('store', uid, '+FLAGS', '\\Seen')
@@ -102,3 +109,4 @@ def fetch_emails():
 
 
 fetch_emails()
+
