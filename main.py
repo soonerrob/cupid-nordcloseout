@@ -6,9 +6,9 @@ import email
 # Load environment variables
 load_dotenv()
 
-hostname = os.getenv('HOSTNAME')
-username = os.getenv('USERNAME')
-password = os.getenv('PASSWORD')
+hostname = os.getenv('EMAIL_HOSTNAME')
+username = os.getenv('EMAIL_USERNAME')
+password = os.getenv('EMAIL_PASSWORD')
 
 
 def process_email_text(text):
