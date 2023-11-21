@@ -4,10 +4,19 @@ import imaplib
 import email
 import re
 from datetime import datetime
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import configparser
 
 # Load environment variables
 load_dotenv()
 
+# Load the configuration file
+config = configparser.ConfigParser()
+config.read(os.getenv("CONFIG_PATH"))
+
+# Load email server config
 hostname = os.getenv('EMAIL_HOSTNAME')
 username = os.getenv('EMAIL_USERNAME')
 password = os.getenv('EMAIL_PASSWORD')
